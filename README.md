@@ -35,7 +35,7 @@ Project builds an ETL pipeline (Extract, Transform, Load) to Extract data from J
 Sparkify analytics database (called here sparkifydb) schema has a star design. Start design means that it has one Fact Table having business data, and supporting Dimension Tables. Star DB design is maybe the most common schema used in ETL pipelines since it separates Dimension data into their own tables in a clean way and collects business critical data into the Fact table allowing flexible queries.
 The Fact Table answers one of the key questions: what songs users are listening to. DB schema is the following:
 
-![SparkifyDB schema as ER Diagram](./Udacity-DEND-Project-5-ERD-20190710v1.png)
+![SparkifyDB schema as ER Diagram](./Udacity-DEND-Project5-ERD-20190710v1.png)
 
 _*SparkifyDB schema as ER Diagram.*_
 
