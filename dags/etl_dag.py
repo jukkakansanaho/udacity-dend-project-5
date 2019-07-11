@@ -52,7 +52,13 @@ stage_events_to_redshift = StageToRedshiftOperator(
 
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id='Stage_songs',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    aws_credentials_id="aws_credentials",
+    target_table=dag_config['song_data_target_staging_table'],
+    s3_bucket=dag_config['song_data_source_s3_bucket'],
+    s3_key=dag_config['song_data_source_s3_key'],
+    file_format=dag_config['song_data_file_format'],
 )
 
 load_songplays_table = LoadFactOperator(

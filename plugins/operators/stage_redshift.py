@@ -53,7 +53,7 @@ class StageToRedshiftOperator(BaseOperator):
         self.ignore_headers = ignore_headers
 
     def execute(self, context):
-        self.log.info('StageToRedshiftOperator not implemented yet')
+        #self.log.info('StageToRedshiftOperator not implemented yet')
 
         # Set AWS S3 and Redshift connections
         aws_hook = AwsHook(self.aws_credentials_id)
@@ -63,12 +63,17 @@ class StageToRedshiftOperator(BaseOperator):
         self.log.info("Clearing data from Redshift target table...")
         redshift.run("DELETE FROM {}".format(self.target_table))
 
-        # Prepare S3 path
+        # Prepare S3 paths
         self.log.info("Copying data from S3 to Redshift...")
         rendered_key = self.s3_key.format(**context)
         s3_path = "s3://{}/{}".format(self.s3_bucket, rendered_key)
-        s3_json_path = "\'s3://{}/{}\'".format(self.s3_bucket, self.json_paths
-        )
+        if self.json_paths == "":
+            s3_json_path = "\'auto\'"
+        else:
+            s3_json_path = "\'s3://{}/{}\'".format(self.s3_bucket, self.json_paths)
+
+        self.log.info("S3_PATH: {}".format(s3_path))
+        self.log.info("S3_JSON_PATH: {}".format(s3_json_path))
 
         # Copy data from S3 to Redshift
         # Select oparations based on input file format (JSON or CSV)
