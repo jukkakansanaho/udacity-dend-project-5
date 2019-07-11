@@ -2,9 +2,12 @@ from datetime import datetime, timedelta
 import os
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators import (StageToRedshiftOperator, LoadFactOperator,
-                                LoadDimensionOperator, DataQualityOperator)
-from helpers import SqlQueries
+from airflow.operators import (
+    StageToRedshiftOperator,
+    LoadFactOperator,
+    LoadDimensionOperator,
+    DataQualityOperator
+)
 
 # AWS_KEY = os.environ.get('AWS_KEY')
 # AWS_SECRET = os.environ.get('AWS_SECRET')
@@ -15,6 +18,7 @@ default_args = {
     'start_date': datetime(2019, 1, 12),
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
+    'catchup_by_default' = False,
     'email_on_retry': False
 }
 
