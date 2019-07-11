@@ -1,3 +1,5 @@
 __pycache__
 .DS_Store
 .ipynb_checkpoints/*
+dag_config.json
+dag_setup_conf.cfg

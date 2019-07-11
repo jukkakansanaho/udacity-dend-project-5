@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 import os
+import logging
+import json
 from airflow import DAG
+from airflow.models import Variable
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators import (
     StageToRedshiftOperator,
@@ -9,30 +12,42 @@ from airflow.operators import (
     DataQualityOperator
 )
 
+# Getting AWS Credentials from env variables.
 # AWS_KEY = os.environ.get('AWS_KEY')
 # AWS_SECRET = os.environ.get('AWS_SECRET')
+
+# Importing config file.
+dag_config = Variable.get("DAG_CONFIG", deserialize_json=True)
 
 default_args = {
     'owner': 'sparkify',
     'depends_on_past': False,
     'start_date': datetime(2019, 1, 12),
     'retries': 3,
-    'retry_delay': timedelta(minutes=5),
-    'catchup_by_default' = False,
+    'retry_delay': timedelta(seconds=15),
+    'catchup_by_default': False,
     'email_on_retry': False
 }
 
 dag = DAG('etl_dag',
           default_args=default_args,
           description='Load and transform data in Redshift with Airflow',
-          schedule_interval='0 * * * *'
+          schedule_interval='0 * * * *',
+          max_active_runs=1
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    aws_credentials_id="aws_credentials",
+    target_table=dag_config['log_data_target_staging_table'],
+    s3_bucket=dag_config['log_data_source_s3_bucket'],
+    s3_key=dag_config['log_data_source_s3_key'],
+    file_format=dag_config['log_data_file_format'],
+    json_paths=dag_config['log_json_path'],
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
