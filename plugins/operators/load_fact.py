@@ -17,6 +17,7 @@ class LoadFactOperator(BaseOperator):
                  redshift_conn_id="",
                  target_table="",
                  target_columns="",
+                 query="",
                  *args, **kwargs):
 
         super(LoadFactOperator, self).__init__(*args, **kwargs)
@@ -24,6 +25,7 @@ class LoadFactOperator(BaseOperator):
         self.redshift_conn_id = redshift_conn_id
         self.target_table = target_table
         self.target_columns = target_columns
+        self.query = query
 
     def execute(self, context):
         # Set AWS Redshift connections
@@ -34,10 +36,17 @@ class LoadFactOperator(BaseOperator):
         redshift.run("DELETE FROM {}".format(self.target_table))
 
         self.log.info("Preparing SQL query for {} table".format(self.target_table))
+        query_name = ""
+        if self.query == "songplay_table_insert":
+            query_name = SqlQueries.songplay_table_insert
+        else:
+            query_name = ""
+            self.log.info("Invalid value in query parameter.")
+
         formatted_sql = LoadFactOperator.sql_template.format(
             self.target_table,
             self.target_columns,
-            SqlQueries.songplay_table_insert
+            query_name
         )
 
         # Executing Load operation

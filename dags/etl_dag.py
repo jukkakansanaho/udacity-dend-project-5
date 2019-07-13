@@ -66,7 +66,8 @@ load_songplays_table = LoadFactOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_table=dag_config['songplays_target_table'],
-    target_columns=dag_config['songplays_target_columns']
+    target_columns=dag_config['songplays_target_columns'],
+    query=dag_config['songplays_insert_query']
 )
 
 load_user_dimension_table = LoadDimensionOperator(
