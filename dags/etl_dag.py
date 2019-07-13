@@ -23,7 +23,7 @@ default_args = {
     'owner': 'sparkify',
     'depends_on_past': False,
     'start_date': datetime(2019, 1, 12),
-    'retries': 3,
+    'retries': 0,
     'retry_delay': timedelta(seconds=15),
     'catchup_by_default': False,
     'email_on_retry': False
@@ -71,22 +71,38 @@ load_songplays_table = LoadFactOperator(
 
 load_user_dimension_table = LoadDimensionOperator(
     task_id='Load_user_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_table=dag_config['user_target_table'],
+    target_columns=dag_config['user_target_columns'],
+    query=dag_config['users_insert_query']
 )
 
 load_song_dimension_table = LoadDimensionOperator(
     task_id='Load_song_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_table=dag_config['song_target_table'],
+    target_columns=dag_config['song_target_columns'],
+    query=dag_config['songs_insert_query']
 )
 
 load_artist_dimension_table = LoadDimensionOperator(
     task_id='Load_artist_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_table=dag_config['artist_target_table'],
+    target_columns=dag_config['artist_target_columns'],
+    query=dag_config['artists_insert_query']
 )
 
 load_time_dimension_table = LoadDimensionOperator(
     task_id='Load_time_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_table=dag_config['time_target_table'],
+    target_columns=dag_config['time_target_columns'],
+    query=dag_config['time_insert_query']
 )
 
 run_quality_checks = DataQualityOperator(

@@ -29,7 +29,8 @@ class LoadFactOperator(BaseOperator):
         # Set AWS Redshift connections
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
 
-        self.log.info("Clearing data from Redshift target table...")
+        self.log.info("Clearing data from Redshift target table {}..."\
+                        .format(self.target_table))
         redshift.run("DELETE FROM {}".format(self.target_table))
 
         self.log.info("Preparing SQL query for {} table".format(self.target_table))
