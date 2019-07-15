@@ -74,6 +74,63 @@ class SqlQueries:
         FROM    staging_events               AS se
         WHERE se.page = 'NextSong';
     """)
+
+    # Data quality check queries:
+    songplays_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM songplays
+        WHERE songplay_id IS NULL;
+    """)
+
+    users_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM users
+        WHERE user_id IS NULL;
+    """)
+
+    songs_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM songs
+        WHERE song_id IS NULL;
+    """)
+
+    artists_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM artists
+        WHERE artist_id IS NULL;
+    """)
+
+    time_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM time
+        WHERE start_time IS NULL;
+    """)
+
+    # Data quality check queries:
+    songplays_check_count = ("""
+        SELECT COUNT(*)
+        FROM songplays;
+    """)
+
+    users_check_count = ("""
+        SELECT COUNT(*)
+        FROM users;
+    """)
+
+    songs_check_count = ("""
+        SELECT COUNT(*)
+        FROM songs;
+    """)
+
+    artists_check_count = ("""
+        SELECT COUNT(*)
+        FROM artists;
+    """)
+
+    time_check_count = ("""
+        SELECT COUNT(*)
+        FROM time;
+    """)
     # -------------------------------------------------------
     # ORIGINAL SQL Queries:
     songplay_table_insert_orig = ("""
