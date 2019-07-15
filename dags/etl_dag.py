@@ -20,11 +20,11 @@ from airflow.operators import (
 dag_config = Variable.get("DAG_CONFIG", deserialize_json=True)
 
 default_args = {
-    'owner': 'sparkify',
+    'owner': 'Sparkify',
     'depends_on_past': False,
     'start_date': datetime(2019, 1, 12),
-    'retries': 0,
-    'retry_delay': timedelta(seconds=15),
+    'retries': 3,
+    'retry_delay': timedelta(minutes=5),
     'catchup_by_default': False,
     'email_on_retry': False
 }
@@ -32,8 +32,7 @@ default_args = {
 dag = DAG('etl_dag',
           default_args=default_args,
           description='Load and transform data in Redshift with Airflow',
-          schedule_interval='0 * * * *',
-          max_active_runs=1
+          schedule_interval='0 * * * *'
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)

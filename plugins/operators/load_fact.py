@@ -4,7 +4,6 @@ from airflow.utils.decorators import apply_defaults
 from helpers import SqlQueries
 
 class LoadFactOperator(BaseOperator):
-
     ui_color = '#F98866'
 
     sql_template = """
