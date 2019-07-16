@@ -17,6 +17,7 @@ class LoadFactOperator(BaseOperator):
                  target_table="",
                  target_columns="",
                  query="",
+                 insert_mode="append",
                  *args, **kwargs):
 
         super(LoadFactOperator, self).__init__(*args, **kwargs)
@@ -25,19 +26,30 @@ class LoadFactOperator(BaseOperator):
         self.target_table = target_table
         self.target_columns = target_columns
         self.query = query
+        self.insert_mode = insert_mode
 
     def execute(self, context):
         # Set AWS Redshift connections
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
 
-        self.log.info("Clearing data from Redshift target table {}..."\
-                        .format(self.target_table))
-        redshift.run("DELETE FROM {}".format(self.target_table))
+        if self.insert_mode == "truncate_insert":
+            self.log.info("Insert_mode = truncate_insert. Clearing data from Redshift target table: {} ..."\
+                            .format(self.target_table))
+            redshift.run("DELETE FROM {}".format(self.target_table))
+        elif self.insert_mode == "append":
+            self.log.info("Insert_mode = append. Inserting new data on top of old one in Redshift target table: {} ..."\
+                            .format(self.target_table))
+        else:
+            self.log.info("Insert_mode not defined => using append (default value). Inserting new data on top of old one in Redshift target table: {} ..."\
+                            .format(self.target_table))
 
         self.log.info("Preparing SQL query for {} table".format(self.target_table))
         query_name = ""
         if self.query == "songplay_table_insert":
-            query_name = SqlQueries.songplay_table_insert
+            if self.insert_mode == "append":
+                query_name = SqlQueries.songplay_table_insert_append
+            else:
+                query_name = SqlQueries.songplay_table_insert_delete
         else:
             query_name = ""
             self.log.info("Invalid value in query parameter.")
@@ -45,7 +57,7 @@ class LoadFactOperator(BaseOperator):
         formatted_sql = LoadFactOperator.sql_template.format(
             self.target_table,
             self.target_columns,
-            query_name
+            query_name.format(self.target_table, self.target_table)
         )
 
         # Executing Load operation

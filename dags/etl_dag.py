@@ -23,19 +23,23 @@ default_args = {
     'owner': 'Sparkify',
     'depends_on_past': False,
     'start_date': datetime(2019, 1, 12),
-    'retries': 3,
-    'retry_delay': timedelta(minutes=5),
+    'retries': 0,
+    'retry_delay': timedelta(seconds=15),
     'catchup_by_default': False,
     'email_on_retry': False
 }
 
 dag = DAG('etl_dag',
-          default_args=default_args,
-          description='Load and transform data in Redshift with Airflow',
-          schedule_interval='0 * * * *'
-        )
+    default_args=default_args,
+    description='Load and transform data in Redshift with Airflow',
+    schedule_interval='0 * * * *',
+    max_active_runs=1
+)
 
-start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
+start_operator = DummyOperator(
+    task_id='Begin_execution',
+    dag=dag
+)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
@@ -46,7 +50,7 @@ stage_events_to_redshift = StageToRedshiftOperator(
     s3_bucket=dag_config['log_data_source_s3_bucket'],
     s3_key=dag_config['log_data_source_s3_key'],
     file_format=dag_config['log_data_file_format'],
-    json_paths=dag_config['log_json_path'],
+    json_paths=dag_config['log_json_path']
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
@@ -57,7 +61,7 @@ stage_songs_to_redshift = StageToRedshiftOperator(
     target_table=dag_config['song_data_target_staging_table'],
     s3_bucket=dag_config['song_data_source_s3_bucket'],
     s3_key=dag_config['song_data_source_s3_key'],
-    file_format=dag_config['song_data_file_format'],
+    file_format=dag_config['song_data_file_format']
 )
 
 load_songplays_table = LoadFactOperator(
@@ -66,7 +70,8 @@ load_songplays_table = LoadFactOperator(
     redshift_conn_id="redshift",
     target_table=dag_config['songplays_target_table'],
     target_columns=dag_config['songplays_target_columns'],
-    query=dag_config['songplays_insert_query']
+    query=dag_config['songplays_insert_query'],
+    insert_mode=dag_config['insert_mode_fact']
 )
 
 load_user_dimension_table = LoadDimensionOperator(
@@ -75,7 +80,8 @@ load_user_dimension_table = LoadDimensionOperator(
     redshift_conn_id="redshift",
     target_table=dag_config['user_target_table'],
     target_columns=dag_config['user_target_columns'],
-    query=dag_config['users_insert_query']
+    query=dag_config['users_insert_query'],
+    insert_mode=dag_config['insert_mode_dim']
 )
 
 load_song_dimension_table = LoadDimensionOperator(
@@ -84,7 +90,8 @@ load_song_dimension_table = LoadDimensionOperator(
     redshift_conn_id="redshift",
     target_table=dag_config['song_target_table'],
     target_columns=dag_config['song_target_columns'],
-    query=dag_config['songs_insert_query']
+    query=dag_config['songs_insert_query'],
+    insert_mode=dag_config['insert_mode_dim']
 )
 
 load_artist_dimension_table = LoadDimensionOperator(
@@ -93,7 +100,8 @@ load_artist_dimension_table = LoadDimensionOperator(
     redshift_conn_id="redshift",
     target_table=dag_config['artist_target_table'],
     target_columns=dag_config['artist_target_columns'],
-    query=dag_config['artists_insert_query']
+    query=dag_config['artists_insert_query'],
+    insert_mode=dag_config['insert_mode_dim']
 )
 
 load_time_dimension_table = LoadDimensionOperator(
@@ -102,7 +110,8 @@ load_time_dimension_table = LoadDimensionOperator(
     redshift_conn_id="redshift",
     target_table=dag_config['time_target_table'],
     target_columns=dag_config['time_target_columns'],
-    query=dag_config['time_insert_query']
+    query=dag_config['time_insert_query'],
+    insert_mode=dag_config['insert_mode_dim']
 )
 
 run_quality_checks = DataQualityOperator(
@@ -112,7 +121,10 @@ run_quality_checks = DataQualityOperator(
     target_table=dag_config['data_quality_check_tables']
 )
 
-end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
+end_operator = DummyOperator(
+    task_id='Stop_execution',
+    dag=dag
+)
 
 
 start_operator >> stage_events_to_redshift
