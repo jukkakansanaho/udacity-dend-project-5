@@ -8,7 +8,7 @@ def drop_tables(cur, conn):
 
     Keyword arguments:
     * cur --    cursory to connected DB. Allows to execute SQL commands.
-    * conn --   (psycopg2) connection to Postgres database (sparkifydb).
+    * conn --   (psycopg2) connection to AWS Redshift database (sparkifydb).
 
     Output:
     * Old sparkifydb database tables are dropped from AWS Redshift.
@@ -29,7 +29,7 @@ def create_tables(cur, conn):
 
     Keyword arguments:
     * cur --    cursory to connected DB. Allows to execute SQL commands.
-    * conn --   (psycopg2) connection to Postgres database (sparkifydb).
+    * conn --   (psycopg2) connection to AWS Redshift database (sparkifydb).
 
     Output:
     * New sparkifydb database tables are created into AWS Redshift.
@@ -54,7 +54,7 @@ def main():
     * password --   Password for the DB.
     * port --       DB port to connect to.
     * cur --        cursory to connected DB. Allows to execute SQL commands.
-    * conn --       (psycopg2) connection to Postgres database (sparkifydb).
+    * conn --       (psycopg2) connection to AWS Redshift database (sparkifydb).
 
     Output:
     * New sparkifydb is created, old tables are droppped,

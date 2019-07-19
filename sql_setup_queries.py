@@ -1,5 +1,22 @@
 # sql_queries.py
+""" SQL queries for preparing AWS Redshift tables for ETL pipeline.
+Queries:
+* staging_events_table_drop  -- Drop staging_events table
+* staging_songs_table_drop   -- Drop staging_songs table
+* songplay_table_drop        -- Drop songplays table
+* user_table_drop            -- Drop users table
+* song_table_drop            -- Drop songs table
+* artist_table_drop          -- Drop artists table
+* time_table_drop            -- Drop time table
 
+* staging_events_table_create -- Create staging_events table
+* staging_songs_table_create  -- Create staging_songs table
+* songplay_table_create       -- Create songplays table
+* user_table_create           -- Create users table
+* song_table_create           -- Create songs table
+* artist_table_create         -- Create artists table
+* time_table_create           -- Create time table
+"""
 # DROP TABLES
 staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
 staging_songs_table_drop = "DROP TABLE IF EXISTS staging_songs"

@@ -5,6 +5,27 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 
 class StageToRedshiftOperator(BaseOperator):
+    """Apache Airflow Operator to Copy source data
+        from AWS S3 to AWS Redshift DB.
+
+    Keyword arguments:
+    * redshift_conn_id      -- AWS Redshift connection ID
+    * aws_credentials_id    -- AWS S3 credentials
+    * target_table          -- AWS Redshift target table name
+    * s3_bucket             -- AWS S3 bucket name
+    * s3_key                -- AWS S3 key
+    * file_format           -- source data file format (JSON | CSV)
+    * json_paths            -- path to JSON data structure (optional)
+    * delimiter             -- delimiter for CSV data (optional)
+    * ignore_headers        -- ignote headers in CSV data (0=no | 1=yes)
+    * use_partitioned_data  -- is source data in partitioned structure
+                                (e.g. source_data/{year}/{month}/df1.json)
+    * execution_date        -- context variable containing date of task's
+                                execution date (e.g. 2019-07-19)
+
+    Output:
+    * source data is COPIED to AWS Redshift staging tables.
+    """
     ui_color = '#358140'
     template_fields = ("s3_key","execution_date")
 

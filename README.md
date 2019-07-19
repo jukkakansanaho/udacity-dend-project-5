@@ -1,4 +1,4 @@
-_(Udacity: Data Engineering Nano Degree) | jukka.kansanaho@gmail.com | 2019-07-10_
+_(Udacity: Data Engineering Nano Degree) | jukka.kansanaho@gmail.com | 2019-07-19_
 
 # PROJECT-5: Data Pipelines
 
@@ -10,7 +10,7 @@ After installing python3 + Apache Airflow libraries and dependencies the followi
 * set-up AWS Redshift cluster
 * configure dag_setup_config.py with AWS Redshift parameters
 * configure AWS S3 and redshift parameters to Apache Airflow Connections
-* configure **DAG_CONFIG** Airflow variable (using dag_config_template.json)
+* configure **DAG_CONFIG** Airflow variable (using dag_config_template.json as a basis)
 * run `create_tables.py` script to create tables to AWS Redshift
 
 When ready, activate from Airflow UI:
@@ -79,14 +79,17 @@ Purpose of this ETL pipeline is to automate data processing and analysis steps.
 
 Project-5 contains the following configuration files:
 
-* **dag_setup_conf_template.cfg**: this file contains a template for AWS Redshift config parameters for create_tables.py script.
+* **dags/dag_setup_conf_template.cfg**: this file contains a template for AWS Redshift config parameters for create_tables.py script.
+
   NOTE: rename this from dag_setup_conf_template.cfg => dag_setup_conf.cfg and add your parameters.
+
 * **dags/dag_config_template.json**: this file contains a template for DAG configurations.
+
   NOTE: define template parameters and store as a Airflow JSON Variable (Airflow-UI => Admin => Variables) with a name **DAG_CONFIG**
 
 Project-5's preparation script consist of the following files:
 
-* **sql_setup_queries.py**: SQL statements used by create_tables.py in creating DB.
+* **sql_setup_queries.py**: SQL statements used by `create_tables.py` in creating DB.
 * **create_tables.py**: a Python script that creates Redshift DB using example of SQL statements used as a basis for DG creation.
 * **create_tables.sql**: example of SQL statements used as a basis in creating creation.
 
@@ -96,9 +99,12 @@ Project-5's Airflow DAG consist of the following files:
 * **dags/etl_dag_quality.py** a separate DAG for executing only data quality checks using DataQualityOperator. NOTE: this DAG expects that the main DAG has been executed at least once to get data to Redshift tables.
 * **plugins/helpers/sql_queries.py**: a SqlQueries class with SQL queries as variables used by Operators. More queries can be added in this file and taken into use by Operators.
 * **plugins/operators/stage_redshift.py**: StageToRedshiftOperator handling source data copying from S3 to Redshift staging tables. JSON as CSV file formats are supported as sources through "file_format" parameter. Configure file format in DAG_CONFIG and use it in main DAG's task using this Operator.
+
+NOTE: user_partitioned_data parameter (True or False) can be used to define whether to process source data based on execution date. If no valid S3 path can be found for based on execution date, Operator FAILs.
+
 * **plugins/operators/load_fact.py**: LoadFactOperator handling data transformation from staging tables to target table.
 * **plugins/operators/data_quality.py**: LoadDimensionOperator handling data transformation from staging tables to target tables.
-* **plugins/operators/load_dimensions.py**: DataQualityOperator handling data quality checks for fact and dimension tables.
+* **plugins/operators/load_dimensions.py**: DataQualityOperator handling data quality checks for fact and dimension tables. It checks mandatory fields in given tables and number of rows in each given table.
 
 ---
 
@@ -112,7 +118,7 @@ Project-5's Airflow DAG consist of the following files:
 
 * **Python3** is recommended as the environment. The most convenient way to install python is to use Anaconda (https://www.anaconda.com/distribution/) either via GUI or command line.
 * **Apache Airflow** (https://airflow.apache.org/start.html).
-* Access to AWS S3 and Redshift services (read and write credentials).
+* Access to **AWS S3** and **AWS Redshift** services (read and write credentials).
 * AWS redshift cluster has been created and is running.
 
 ### Run ETL pipeline

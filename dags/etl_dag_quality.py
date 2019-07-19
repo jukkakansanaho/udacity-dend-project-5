@@ -15,14 +15,19 @@ from airflow.operators import (
 # Getting AWS Credentials from env variables.
 # AWS_KEY = os.environ.get('AWS_KEY')
 # AWS_SECRET = os.environ.get('AWS_SECRET')
-
+""" This Apache Airflow DAG provides a pipeline to
+* Verify data quality in Start schema Fact and Dimension tables
+    (Tasks: Run_data_quality_checks)
+* As a default, DASG has been run every hour, starting from 2018-11-1
+* In case of failure, DAG doesn't retry
+"""
 # Importing config file.
 dag_config = Variable.get("DAG_CONFIG", deserialize_json=True)
 
 default_args = {
     'owner': 'sparkify',
     'depends_on_past': False,
-    'start_date': datetime(2019, 1, 12),
+    'start_date': datetime(2018, 11, 1),
     'retries': 0,
     'retry_delay': timedelta(seconds=15),
     'catchup_by_default': False,

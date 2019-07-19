@@ -4,6 +4,23 @@ from airflow.utils.decorators import apply_defaults
 from helpers import SqlQueries
 
 class LoadFactOperator(BaseOperator):
+    """Apache Airflow Operator to load data
+        from AWS Redshift staging tables to Fact table.
+
+    Keyword arguments:
+    * redshift_conn_id      -- AWS Redshift connection ID
+    * target_table          -- AWS Redshift target table name
+    * target_columns        -- AWS Redshift target columns (string)
+    * query                 -- Query name to be used from SqlQueries.
+    * insert_mode           -- How to insert data to target_table
+                                (append = on top of existing data (default)
+                                 truncate_insert = delete old data +
+                                                    insert new data)
+
+    Output:
+    * Staging data in AWS Redshift is inserted from staging tables
+        to Fact table.
+    """
     ui_color = '#F98866'
 
     sql_template = """
@@ -43,6 +60,7 @@ class LoadFactOperator(BaseOperator):
             self.log.info("Insert_mode not defined => using append (default value). Inserting new data on top of old one in Redshift target table: {} ..."\
                             .format(self.target_table))
 
+        # Prepare SQL query
         self.log.info("Preparing SQL query for {} table".format(self.target_table))
         query_name = ""
         if self.query == "songplay_table_insert":

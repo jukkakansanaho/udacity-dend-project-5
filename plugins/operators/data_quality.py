@@ -4,6 +4,19 @@ from airflow.utils.decorators import apply_defaults
 from helpers import SqlQueries
 
 class DataQualityOperator(BaseOperator):
+    """Apache Airflow Operator to verify data quality
+        of loaded data in AWS Redshift table.
+        Operator selects suitable SQL query based on target table name(s).
+        Operator checks mandatory fields of the table (e.g. id field).
+
+    Keyword arguments:
+    * redshift_conn_id      -- AWS Redshift connection ID
+    * target_table          -- AWS Redshift target table name(s) (string)
+                                (e.g. star schema Fatc or Dimension table)
+
+    Output:
+    * PASS | FAIL statement based on data quality checks.
+    """
     ui_color = '#89DA59'
 
     @apply_defaults

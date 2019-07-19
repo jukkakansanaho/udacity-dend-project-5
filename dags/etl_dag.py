@@ -15,7 +15,17 @@ from airflow.operators import (
 # Getting AWS Credentials from env variables.
 # AWS_KEY = os.environ.get('AWS_KEY')
 # AWS_SECRET = os.environ.get('AWS_SECRET')
-
+""" This Apache Airflow DAG provides a pipeline to
+* COPY data from AWS S3 to AWS Redshift staging Tables
+    (Tasks: Stage_events, Stage_songs)
+* Load data from staging tables to star schema fact and dimensions Tables
+    (Tasks: Load_songplays_fact_table, Load_user_dim_table, Load_song_dim_table,
+    Load_artist_dim_table, Load_time_dim_table)
+* Verify the data loaded to fast and dimension tables
+    (Tasks: Run_data_quality_checks)
+* As a default, DAG has been set to run daily, starting from 2018-11-01
+* In case of failure, DAG retries 3 times, after 5 min delay
+"""
 # Importing config file.
 dag_config = Variable.get("DAG_CONFIG", deserialize_json=True)
 
@@ -23,8 +33,8 @@ default_args = {
     'owner': 'Sparkify',
     'depends_on_past': False,
     'start_date': datetime(2018, 11, 1),
-    'retries': 0,
-    'retry_delay': timedelta(seconds=15),
+    'retries': 3,
+    'retry_delay': timedelta(minutes=5),
     'catchup_by_default': False,
     'email_on_retry': False
 }
@@ -32,8 +42,7 @@ default_args = {
 dag = DAG('etl_dag',
     default_args=default_args,
     description='Load and transform data in Redshift with Airflow',
-    schedule_interval='0 * * * *',
-    max_active_runs=1
+    schedule_interval='0 * * * *'
 )
 
 start_operator = DummyOperator(

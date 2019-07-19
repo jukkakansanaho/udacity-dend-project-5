@@ -1,25 +1,34 @@
 class SqlQueries:
+    """ SQL queries for ETL pipeline orchestrated with Apache Airflow.
+    Queries:
+    * songplay_table_insert_delete  -- delete and insert data to songplay table
+    * user_table_insert_delete      -- delete and insert data to user table
+    * song_table_insert_delete      -- delete and insert data to song table
+    * artist_table_insert_delete    -- delete and insert data to artist table
+    * time_table_insert_delete      -- delete and insert data to time table
+
+    * songplay_table_insert_append  -- append data to songplay table
+    * user_table_insert_append      -- append data to user table
+    * song_table_insert_append      -- append data to song table
+    * artist_table_insert_append    -- append data to artist table
+    * time_table_insert_append      -- append data to time table
+
+    * songplays_check_nulls         -- check that no nulls in songplays table
+    * user_check_nulls              -- check that no nulls in user table
+    * song_check_nulls              -- check that no nulls in song table
+    * artist_check_nulls            -- check that no nulls in artist table
+    * time_check_nulls              -- check that no nulls in time table
+
+    * songplays_check_count         -- count rows in songplays table
+    * user_check_count              -- count rows in user table
+    * song_check_count              -- count rows in song table
+    * artist_check_count            -- count rows in artist table
+    * time_check_count              -- count rows in time table
+    """
+    
     # TRUNCATE-INSERT SQL queries:
     songplay_table_insert_delete = ("""
         SELECT DISTINCT TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second'   AS start_time,
-            se.userId                   AS user_id,
-            se.level                    AS level,
-            ss.song_id                  AS song_id,
-            ss.artist_id                AS artist_id,
-            se.sessionId                AS session_id,
-            se.location                 AS location,
-            se.userAgent                AS user_agent
-        FROM staging_events AS se
-        JOIN staging_songs AS ss
-        ON (se.artist = ss.artist_name
-            AND se.artist = ss.artist_name
-            AND se.length = ss.duration)
-        WHERE se.page = 'NextSong';
-    """)
-
-    songplay_table_insert_not_working = ("""
-        SELECT DISTINCT TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second'   AS start_time,
-            md5(se.sessionid)           AS songplay_id,
             se.userId                   AS user_id,
             se.level                    AS level,
             ss.song_id                  AS song_id,
