@@ -4,6 +4,12 @@
   "log_data_file_format": "<ADD log_data format (json | csv)>",
   "log_json_path":
     "<ADD log_data jsonpath file used in log_data COPY operation>",
+  "log_data_partitioned":
+    "< Is source data partitioned: True | False (as a string)>",
+  "insert_mode_dim":
+    "<Insert mode for Dimension tables (append | truncate_insert)>",
+  "insert_mode_fact":
+    "<Insert mode for Fact tables (append | truncate_insert)>",
   "song_data_source_s3_bucket": "<ADD log_data S3 key name>",
   "song_data_source_s3_key": "<ADD log_data S3 key name>",
   "song_data_file_format": "<ADD log_data format (json | csv)>",
@@ -14,16 +20,21 @@
   "artist_target_table": "<ADD table name for artist dimension table>",
   "user_target_table": "<ADD table name for users dimension table>",
   "time_target_table": "<ADD table name for time dimension table>",
-  "songplays_target_columns": "<ADD target columns for songplays table>",
-  "user_target_columns": "<ADD target columns for user table>",
-  "song_target_columns": "<ADD target columns for song table>",
-  "artist_target_columns": "<ADD target columns for artist table>",
-  "time_target_columns": "<ADD target columns for time table>",
+  "songplays_target_columns":
+    "<ADD target columns for songplays table (separated with comma (,) )>",
+  "user_target_columns":
+    "<ADD target columns for user table  (separated with comma (,) >",
+  "song_target_columns":
+    "<ADD target columns for song table  (separated with comma (,) >",
+  "artist_target_columns":
+    "<ADD target columns for artist table  (separated with comma (,) >",
+  "time_target_columns":
+    "<ADD target columns for time table  (separated with comma (,) >",
   "songplays_insert_query": "<ADD data transfer SQL query for songplays table>",
   "songs_insert_query": "<ADD data transfer SQL query for songs table>",
   "artists_insert_query": "<ADD data transfer SQL query for artists table>",
   "users_insert_query": "<ADD data transfer SQL query for users table>",
   "time_insert_query": "<ADD data transfer SQL query for time table>",
   "data_quality_check_tables":
-    "<ADD table names for which data check are run against>"
+    "<ADD table names for which data check is run against>"
 }

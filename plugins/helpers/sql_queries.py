@@ -25,7 +25,7 @@ class SqlQueries:
     * artist_check_count            -- count rows in artist table
     * time_check_count              -- count rows in time table
     """
-    
+
     # TRUNCATE-INSERT SQL queries:
     songplay_table_insert_delete = ("""
         SELECT DISTINCT TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second'   AS start_time,
@@ -161,7 +161,9 @@ class SqlQueries:
     songplays_check_nulls = ("""
         SELECT COUNT(*)
         FROM songplays
-        WHERE songplay_id IS NULL;
+        WHERE   songplay_id IS NULL OR
+                start_time IS NULL OR
+                user_id IS NULL;
     """)
 
     users_check_nulls = ("""
