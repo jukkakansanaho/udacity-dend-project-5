@@ -22,7 +22,7 @@ dag_config = Variable.get("DAG_CONFIG", deserialize_json=True)
 default_args = {
     'owner': 'Sparkify',
     'depends_on_past': False,
-    'start_date': datetime(2019, 1, 12),
+    'start_date': datetime(2018, 11, 1),
     'retries': 0,
     'retry_delay': timedelta(seconds=15),
     'catchup_by_default': False,
@@ -50,7 +50,9 @@ stage_events_to_redshift = StageToRedshiftOperator(
     s3_bucket=dag_config['log_data_source_s3_bucket'],
     s3_key=dag_config['log_data_source_s3_key'],
     file_format=dag_config['log_data_file_format'],
-    json_paths=dag_config['log_json_path']
+    json_paths=dag_config['log_json_path'],
+    use_partitioned_data=dag_config['log_data_partitioned'],
+    execution_date="{{ ds }}"
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
@@ -61,7 +63,9 @@ stage_songs_to_redshift = StageToRedshiftOperator(
     target_table=dag_config['song_data_target_staging_table'],
     s3_bucket=dag_config['song_data_source_s3_bucket'],
     s3_key=dag_config['song_data_source_s3_key'],
-    file_format=dag_config['song_data_file_format']
+    file_format=dag_config['song_data_file_format'],
+    use_partitioned_data=dag_config['song_data_partitioned'],
+    execution_date="{{ ds }}"
 )
 
 load_songplays_table = LoadFactOperator(

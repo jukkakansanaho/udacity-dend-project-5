@@ -1,3 +1,4 @@
+import datetime
 from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.hooks.postgres_hook import PostgresHook
 from airflow.models import BaseOperator
@@ -5,7 +6,7 @@ from airflow.utils.decorators import apply_defaults
 
 class StageToRedshiftOperator(BaseOperator):
     ui_color = '#358140'
-    template_fields = ("s3_key",)
+    template_fields = ("s3_key","execution_date")
 
     # SQL template for CSV input format
     sql_template_csv = """
@@ -37,6 +38,8 @@ class StageToRedshiftOperator(BaseOperator):
                  json_paths="",
                  delimiter=",",
                  ignore_headers=1,
+                 use_partitioned_data="False",
+                 execution_date="",
                  *args, **kwargs):
 
         super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
@@ -51,6 +54,8 @@ class StageToRedshiftOperator(BaseOperator):
         self.json_paths = json_paths
         self.delimeter = delimiter
         self.ignore_headers = ignore_headers
+        self.execution_date = execution_date
+        self.use_partitioned_data = use_partitioned_data
 
     def execute(self, context):
         # Set AWS S3 and Redshift connections
@@ -65,12 +70,32 @@ class StageToRedshiftOperator(BaseOperator):
 
         # Prepare S3 paths
         self.log.info("Preparing Copying data from S3 to Redshift...")
-        rendered_key = self.s3_key.format(**context)
+        exec_date_rendered = self.execution_date.format(**context)
+        self.log.info("Execution_date: {}".format(exec_date_rendered))
+        exec_date_obj = datetime.datetime.strptime( exec_date_rendered, \
+                                                    '%Y-%m-%d')
+        self.log.info("Execution_year: {}".format(exec_date_obj.year))
+        self.log.info("Execution_month: {}".format(exec_date_obj.month))
+        rendered_key_raw = self.s3_key.format(**context)
+        self.log.info("Rendered_key_raw: {}".format(rendered_key_raw))
+
+        if self.use_partitioned_data == "True":
+            self.log.info("Rendered_key_raw: {}".format(rendered_key_raw))
+            rendered_key = rendered_key_raw.format(\
+                                        exec_date_obj.year, \
+                                        exec_date_obj.month)
+        else:
+            rendered_key = rendered_key_raw
+        self.log.info("Rendered_key: {}".format(rendered_key))
+
         s3_path = "s3://{}/{}".format(self.s3_bucket, rendered_key)
+        self.log.info("S3_path: ".format(s3_path))
+
         if self.json_paths == "":
             s3_json_path = "\'auto\'"
         else:
-            s3_json_path = "\'s3://{}/{}\'".format(self.s3_bucket, self.json_paths)
+            s3_json_path = "\'s3://{}/{}\'".format( self.s3_bucket, \
+                                                    self.json_paths)
 
         self.log.info("S3_PATH: {}".format(s3_path))
         self.log.info("S3_JSON_PATH: {}".format(s3_json_path))
